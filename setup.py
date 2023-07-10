@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 
 setup(
-    name='AsGeometryOCCWrapper',
+    name='asGeometryOCCWrapper',
     version='1.0',
     packages=find_packages()
 )
