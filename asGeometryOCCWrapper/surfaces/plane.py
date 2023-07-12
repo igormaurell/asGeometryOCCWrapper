@@ -16,7 +16,7 @@ class Plane(BaseElementarySurface):
         return Geom_Plane(adaptor.Plane())
     
     @classmethod
-    def fromDict(cls, features: dict):
+    def _fromDict(cls, features: dict):
         geom = Geom_Plane(gp_Ax3(gp_Pnt(*features['location']), gp_Dir(*features['z_axis']),
                                  gp_Dir(*features['x_axis'])))
         orientation = int(not features['foward'])

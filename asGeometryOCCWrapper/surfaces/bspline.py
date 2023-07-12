@@ -18,7 +18,7 @@ class BSpline(BaseBoundedSurface):
         return adaptor.BSpline()
     
     @classmethod
-    def fromDict(cls, features: dict):
+    def _fromDict(cls, features: dict):
         poles = list2tcol2d(features['poles'], TColgp_Array2OfPnt, gp_Pnt)
         u_knots = list2tcol1d(features['u_knots'], TColStd_Array1OfReal, float)
         v_knots = list2tcol1d(features['v_knots'], TColStd_Array1OfReal, float)
@@ -76,7 +76,6 @@ class BSpline(BaseBoundedSurface):
     def getWeights(self):
         data = TColStd_Array2OfReal(1, self._geom.NbUPoles(), 1, self._geom.NbVPoles())
         self._geom.Weights(data)
-        print(data.RowLength(), data.ColLength())
         return [list(data.Value(i+1, j+1) for j in range(data.RowLength())) 
                 for i in range(data.ColLength())]
 

@@ -1,4 +1,5 @@
 from OCC.Core.Geom import Geom_ToroidalSurface
+from OCC.Core.TColStd import TColStd_Array1OfReal
 from OCC.Core.gp import gp_Pnt, gp_Ax3, gp_Dir
 
 from .base_surfaces import BaseElementarySurface
@@ -14,7 +15,7 @@ class Torus(BaseElementarySurface):
         return Geom_ToroidalSurface(adaptor.Torus())
 
     @classmethod
-    def fromDict(cls, features: dict):
+    def _fromDict(cls, features: dict):
         geom = Geom_ToroidalSurface(gp_Ax3(gp_Pnt(*features['location']), 
                                            gp_Dir(*features['z_axis']),
                                            gp_Dir(*features['x_axis'])),
@@ -22,9 +23,13 @@ class Torus(BaseElementarySurface):
         orientation = int(not features['foward'])
         return cls(geom, orientation)
     
-    #TODO: add coeffs to torus
-    def getCoefficients(self):    
-        return []
+    def getCoefficients(self):
+        data = TColStd_Array1OfReal(1, 31)
+        try:
+            self._geom.Coefficients(data)
+        except:
+            data = []
+        return list(data)
     
     def getMajorRadius(self):    
         return self._geom.MajorRadius()

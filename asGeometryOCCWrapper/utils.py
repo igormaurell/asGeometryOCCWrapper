@@ -11,7 +11,6 @@ def list2tcol1d(l, tcol_tp, data_tp):
     return tcol
 
 def list2tcol2d(l, tcol_tp, data_tp):
-    print(l)
     length1 = len(l)
     length2 = len(l[0])
     tcol = tcol_tp(1, length1, 1, length2)

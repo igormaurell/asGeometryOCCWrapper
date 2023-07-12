@@ -45,8 +45,14 @@ class BaseGeometry(metaclass=abc.ABCMeta):
 
     @classmethod
     @abc.abstractmethod
-    def fromDict(cls, features: dict):
+    def _fromDict(cls, features: dict):
         pass
+
+    @classmethod
+    def fromDict(cls, features: dict):
+        obj = cls._fromDict(features)
+        obj.setMeshInfo(features)
+        return obj
         
     def __init__(self, geom: Union[Geom_Curve, Geom_Surface], topods_orientation: int = 0,
                  mesh_info: dict = None):
@@ -54,6 +60,7 @@ class BaseGeometry(metaclass=abc.ABCMeta):
         self.setGeom(geom, topods_orientation=topods_orientation)
 
         self._mesh = None #optional
+        self._mesh_info = None
 
         self.setMeshInfo(mesh_info)
     
@@ -139,6 +146,7 @@ class BaseGeometry(metaclass=abc.ABCMeta):
 
     #TODO: create a enum
     '''
+    -1 - ERROR
     0  - NOTHING
     1  - JUST_MESH_INFO
     2  - JUST_LOCAL_MESH
@@ -146,8 +154,24 @@ class BaseGeometry(metaclass=abc.ABCMeta):
     4  - BOTH_RIGHT
     '''
 
-    def setMeshInfo(self, mesh_info: dict):     
-        self._mesh_info = mesh_info
+    def setMeshInfo(self, mesh_info: dict):
+        if mesh_info is None:
+            return -1
+        mesh_info_keys_mask = np.zeros(len(self.__class__.MESH_INFO_KEYS)).astype(np.bool8)
+        mesh_info_filtered = {}
+        for key in mesh_info.keys() & self.__class__.MESH_INFO_KEYS:
+            idx = self.__class__.MESH_INFO_KEYS.index(key)
+            if mesh_info_keys_mask[idx] == True:
+                mesh_info_keys_mask[idx] = False
+                break
+
+            mesh_info_keys_mask[idx] = True
+            mesh_info_filtered[key] = mesh_info[key]
+
+        if not np.all(mesh_info_keys_mask):
+            return -1
+                
+        self._mesh_info = mesh_info_filtered
 
         if self._mesh_info is None:
             if self._mesh is None:
@@ -169,7 +193,7 @@ class BaseGeometry(metaclass=abc.ABCMeta):
         self._mesh = local_mesh
         return 2
     
-    def setMeshByGlobal(self, global_mesh: Union[o3d.geometry.LineSet, o3d.geometry.TriangleMesh], mesh_info: dict):
+    def setMeshByGlobal(self, global_mesh: Union[o3d.geometry.LineSet, o3d.geometry.TriangleMesh], mesh_info: dict = None):
         self._mesh = None
 
         if self.setMeshInfo(mesh_info) == 0:
@@ -179,4 +203,7 @@ class BaseGeometry(metaclass=abc.ABCMeta):
                 
     def getMesh(self):
         return self._mesh
+    
+    def getMeshInfo(self):
+        return self._mesh_info
     

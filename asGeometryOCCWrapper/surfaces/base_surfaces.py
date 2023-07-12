@@ -68,18 +68,18 @@ class BaseSurface(BaseGeometry, metaclass=abc.ABCMeta):
         self._mesh.compute_vertex_normals(normalized)
         #self._mesh.vertex_normals = o3d.utility.Vector3dVector(-np.asarray(self._mesh.vertex_normals))
     
-    def setMeshByGlobal(self, global_mesh: o3d.geometry.TriangleMesh, mesh_info: dict):
+    def setMeshByGlobal(self, global_mesh: o3d.geometry.TriangleMesh, mesh_info: dict = None):
         res = super().setMeshByGlobal(global_mesh, mesh_info)
 
         if res == 0:
             return res
         
-        if len(mesh_info['vert_indices']) == 0 or len(mesh_info['face_indices']) == 0:
+        if self._mesh_info is None or len(self._mesh_info['vert_indices']) == 0 or len(self._mesh_info['face_indices']) == 0:
             return 1
                 
-        vert_indices = np.asarray(mesh_info['vert_indices'], dtype=np.uint64)
+        vert_indices = np.asarray(self._mesh_info['vert_indices'], dtype=np.uint64)
         reverse_vert_map = dict([(vi, i) for i, vi in enumerate(vert_indices)])
-        face_indices = np.asarray(mesh_info['face_indices'], dtype=np.uint64)
+        face_indices = np.asarray(self._mesh_info['face_indices'], dtype=np.uint64)
         faces_local = np.vectorize(reverse_vert_map.get)(np.asarray(global_mesh.triangles)[face_indices])
 
         self._mesh = o3d.geometry.TriangleMesh()

@@ -14,7 +14,7 @@ class Cone(BaseElementarySurface):
         return Geom_ConicalSurface(adaptor.Cone())
 
     @classmethod
-    def fromDict(cls, features: dict):
+    def _fromDict(cls, features: dict):
         geom = Geom_ConicalSurface(gp_Ax3(gp_Pnt(*features['location']), 
                                           gp_Dir(*features['z_axis']),
                                           gp_Dir(*features['x_axis'])), 

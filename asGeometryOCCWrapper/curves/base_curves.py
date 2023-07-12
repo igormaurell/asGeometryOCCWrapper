@@ -27,16 +27,16 @@ class BaseCurve(BaseGeometry, metaclass=abc.ABCMeta):
     def projectPointsOnGeometry(self, points):
         return [], [], []
 
-    def setMeshByGlobal(self, global_mesh: o3d.geometry.LineSet, mesh_info: dict):
+    def setMeshByGlobal(self, global_mesh: o3d.geometry.LineSet, mesh_info: dict = None):
         res = super().setMeshByGlobal(global_mesh, mesh_info)
 
         if res == 0:
             return res
         
-        if len(mesh_info['vert_indices']) == 0:
+        if self._mesh_info is None or len(self._mesh_info['vert_indices']) == 0:
             return 1
                 
-        vert_indices = np.asarray(mesh_info['vert_indices'], dtype=np.uint64)
+        vert_indices = np.asarray(self._mesh_info['vert_indices'], dtype=np.uint64)
 
         self._mesh = o3d.geometry.LineSet()
         self._mesh.points = o3d.utility.Vector3dVector(np.asarray(global_mesh.vertices)[vert_indices])

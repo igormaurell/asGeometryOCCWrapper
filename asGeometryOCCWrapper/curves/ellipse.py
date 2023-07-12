@@ -14,7 +14,7 @@ class Ellipse(BaseConicCurve):
         return Geom_Ellipse(adaptor.Ellipse())
     
     @classmethod
-    def fromDict(cls, features: dict):
+    def _fromDict(cls, features: dict):
         geom = Geom_Ellipse(gp_Ax2(gp_Pnt(*features['location']), gp_Dir(*features['z_axis']),
                                    gp_Dir(*features['x_axis'])), features['x_radius'], features['y_radius'])
         orientation = int(not features['foward'])

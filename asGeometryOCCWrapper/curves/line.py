@@ -14,7 +14,7 @@ class Line(BaseCurve):
         return Geom_Line(adaptor.Line())
     
     @classmethod
-    def fromDict(cls, features: dict):
+    def _fromDict(cls, features: dict):
         geom = Geom_Line(gp_Pnt(*features['location']), gp_Dir(*features['direction']))
         orientation = int(not features['foward'])
         return cls(geom, orientation)

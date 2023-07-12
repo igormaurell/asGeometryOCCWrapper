@@ -14,7 +14,7 @@ class Cylinder(BaseElementarySurface):
         return Geom_CylindricalSurface(adaptor.Cylinder())
     
     @classmethod
-    def fromDict(cls, features: dict):
+    def _fromDict(cls, features: dict):
         geom = Geom_CylindricalSurface(gp_Ax3(gp_Pnt(*features['location']), 
                                               gp_Dir(*features['z_axis']),
                                               gp_Dir(*features['x_axis'])), features['radius'])

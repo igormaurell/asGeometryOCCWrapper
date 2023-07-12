@@ -18,7 +18,7 @@ class BSpline(BaseBoundedCurve):
         return adaptor.BSpline()
     
     @classmethod
-    def fromDict(cls, features: dict):
+    def _fromDict(cls, features: dict):
         poles = list2tcol1d(features['poles'], TColgp_Array1OfPnt, gp_Pnt)
         knots = list2tcol1d(features['knots'], TColStd_Array1OfReal, float)
         weights = list2tcol1d(features['weights'], TColStd_Array1OfReal, float)
