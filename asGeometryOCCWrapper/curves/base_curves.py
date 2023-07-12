@@ -5,6 +5,9 @@ from OCC.Core.Geom import Geom_Curve
 from OCC.Core.GeomAdaptor import GeomAdaptor_Curve
 from OCC.Core.BRepAdaptor import BRepAdaptor_Curve
 
+import numpy as np
+import open3d as o3d
+
 from ..geometry.base_geometry import BaseGeometry
 
 class BaseCurve(BaseGeometry, metaclass=abc.ABCMeta):
@@ -23,6 +26,26 @@ class BaseCurve(BaseGeometry, metaclass=abc.ABCMeta):
 
     def projectPointsOnGeometry(self, points):
         return [], [], []
+
+    def setMeshByGlobal(self, global_mesh: o3d.geometry.LineSet, mesh_info: dict):
+        res = super().setMeshByGlobal(global_mesh, mesh_info)
+
+        if res == 0:
+            return res
+        
+        if len(mesh_info['vert_indices']) == 0:
+            return 1
+                
+        vert_indices = np.asarray(mesh_info['vert_indices'], dtype=np.uint64)
+
+        self._mesh = o3d.geometry.LineSet()
+        self._mesh.points = o3d.utility.Vector3dVector(np.asarray(global_mesh.vertices)[vert_indices])
+        lines = np.asarray([[i, i+1] for i in range(len(self._mesh.points) - 1)])
+        self._mesh.lines = o3d.utility.Vector2iVector(lines)
+        #TODO: add if for the other possible data from global_mesh
+    
+        return 4
+
 
 class BaseConicCurve(BaseCurve, metaclass=abc.ABCMeta):
     

@@ -1,4 +1,5 @@
 from OCC.Core.Geom import Geom_Plane
+from OCC.Core.gp import gp_Pnt, gp_Ax3, gp_Dir
 
 import numpy as np
 
@@ -13,6 +14,13 @@ class Plane(BaseElementarySurface):
     @staticmethod
     def adaptor2Geom(adaptor):
         return Geom_Plane(adaptor.Plane())
+    
+    @classmethod
+    def fromDict(cls, features: dict):
+        geom = Geom_Plane(gp_Ax3(gp_Pnt(*features['location']), gp_Dir(*features['z_axis']),
+                                 gp_Dir(*features['x_axis'])))
+        orientation = int(not features['foward'])
+        return cls(geom, orientation)
     
     def _fixOrientation(self):
         if self._orientation == 1:

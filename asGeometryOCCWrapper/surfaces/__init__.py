@@ -11,20 +11,31 @@ from .plane import Plane
 from .torus import Torus
 from .sphere import Sphere
 from .cylinder import Cylinder
+from .bspline import BSpline
 from .extrusion import Extrusion
 from .revolution import Revolution
-from .bspline_surface import BSplineSurface
 
 #TODO: make a GeometryFactory class for Curve and Surface
 class SurfaceFactory:
 
-    SURFACE_CLASSES = {
+    FEATURES_SURFACE_CLASSES = {
+        'Plane': Plane,
+        'Cylinder': Cylinder,
+        'Cone': Cone,
+        'Sphere': Sphere,
+        'Torus': Torus,
+        'BSpline': BSpline,
+        #GeomAbs_SurfaceType.GeomAbs_SurfaceOfExtrusion: Extrusion,
+        #GeomAbs_SurfaceType.GeomAbs_SurfaceOfRevolution: Revolution
+    }
+
+    OCC_SURFACE_CLASSES = {
         GeomAbs_SurfaceType.GeomAbs_Plane: Plane,
         GeomAbs_SurfaceType.GeomAbs_Cylinder: Cylinder,
         GeomAbs_SurfaceType.GeomAbs_Cone: Cone,
         GeomAbs_SurfaceType.GeomAbs_Sphere: Sphere,
         GeomAbs_SurfaceType.GeomAbs_Torus: Torus,
-        GeomAbs_SurfaceType.GeomAbs_BSplineSurface: BSplineSurface,
+        GeomAbs_SurfaceType.GeomAbs_BSplineSurface: BSpline,
         #GeomAbs_SurfaceType.GeomAbs_SurfaceOfExtrusion: Extrusion,
         #GeomAbs_SurfaceType.GeomAbs_SurfaceOfRevolution: Revolution
     }
@@ -32,8 +43,8 @@ class SurfaceFactory:
     @classmethod
     def adaptor2Geom(cls, adaptor: Union[BRepAdaptor_Surface, GeomAdaptor_Surface]):
         cls_type = GeomAbs_SurfaceType(adaptor.GetType())
-        if cls_type in cls.SURFACE_CLASSES:
-            geom = cls.SURFACE_CLASSES[cls_type].adaptor2Geom(adaptor)
+        if cls_type in cls.OCC_SURFACE_CLASSES:
+            geom = cls.OCC_SURFACE_CLASSES[cls_type].adaptor2Geom(adaptor)
             return geom, cls_type
 
     @classmethod
@@ -52,8 +63,16 @@ class SurfaceFactory:
         if cls_type is None:
             cls_type = GeomAbs_SurfaceType(GeomAdaptor_Surface(geom).GetType())
 
-        if cls_type in cls.SURFACE_CLASSES:
-            return cls.SURFACE_CLASSES[cls_type](geom, topods_orientation=topods_orientation)
+        if cls_type in cls.OCC_SURFACE_CLASSES:
+            return cls.OCC_SURFACE_CLASSES[cls_type](geom, topods_orientation=topods_orientation)
         else:
             return None
     
+    @classmethod
+    def fromDict(cls, feature: dict):
+        cls_type = feature['type']
+
+        if cls_type in cls.FEATURES_SURFACE_CLASSES:
+            return cls.FEATURES_SURFACE_CLASSES[cls_type].fromDict(feature)
+        else:
+            return None

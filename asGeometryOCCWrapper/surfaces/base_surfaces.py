@@ -131,10 +131,6 @@ class BaseSurface(BaseGeometry, metaclass=abc.ABCMeta):
             print(f'[ERROR] Normals on {self.getType()}: error of {percent_error:.2%} and {mean_error:.2f}° \n {normals_with_error}')
         
         return ret
-            
-
-        
-
 
 
 class BaseElementarySurface(BaseSurface, metaclass=abc.ABCMeta):
@@ -224,7 +220,6 @@ class BaseSweptSurface(BaseSurface, metaclass=abc.ABCMeta):
     def toDict(self):
         features = super().toDict()
 
-        print(self.getCurve())
         features['curve'] = self.getCurve().toDict()
             
         return features

@@ -13,7 +13,14 @@ from .bspline import BSpline
 
 class CurveFactory:
 
-    CURVE_CLASSES = {
+    FEATURES_CURVE_CLASSES = {
+        'Line': Line,
+        'Circle': Circle,
+        'Ellipse': Ellipse,
+        'BSpline': BSpline,
+    }
+
+    OCC_CURVE_CLASSES = {
         GeomAbs_CurveType.GeomAbs_Line: Line,
         GeomAbs_CurveType.GeomAbs_Circle: Circle,
         GeomAbs_CurveType.GeomAbs_Ellipse: Ellipse,
@@ -23,8 +30,8 @@ class CurveFactory:
     @classmethod
     def adaptor2Geom(cls, adaptor: Union[BRepAdaptor_Curve, GeomAdaptor_Curve]):
         cls_type = GeomAbs_CurveType(adaptor.GetType())
-        if cls_type in cls.CURVE_CLASSES:
-            geom = cls.CURVE_CLASSES[cls_type].adaptor2Geom(adaptor)
+        if cls_type in cls.OCC_CURVE_CLASSES:
+            geom = cls.OCC_CURVE_CLASSES[cls_type].adaptor2Geom(adaptor)
             return geom, cls_type
 
     @classmethod
@@ -43,8 +50,17 @@ class CurveFactory:
         if cls_type is None:
             cls_type = GeomAbs_CurveType(GeomAdaptor_Curve(geom).GetType())
 
-        if cls_type in cls.CURVE_CLASSES:
-            return cls.CURVE_CLASSES[cls_type](geom, topods_orientation=topods_orientation)
+        if cls_type in cls.OCC_CURVE_CLASSES:
+            return cls.OCC_CURVE_CLASSES[cls_type](geom, topods_orientation=topods_orientation)
+        else:
+            return None
+    
+    @classmethod
+    def fromDict(cls, feature: dict):
+        cls_type = feature['type']
+
+        if cls_type in cls.FEATURES_CURVE_CLASSES:
+            return cls.FEATURES_CURVE_CLASSES[cls_type].fromDict(feature)
         else:
             return None
     

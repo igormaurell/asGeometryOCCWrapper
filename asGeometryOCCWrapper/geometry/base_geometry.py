@@ -43,6 +43,11 @@ class BaseGeometry(metaclass=abc.ABCMeta):
     def adaptor2Geom(adaptor: Union[BRepAdaptor_Curve, GeomAdaptor_Curve, BRepAdaptor_Surface, GeomAdaptor_Surface]):
         pass
 
+    @classmethod
+    @abc.abstractmethod
+    def fromDict(cls, features: dict):
+        pass
+        
     def __init__(self, geom: Union[Geom_Curve, Geom_Surface], topods_orientation: int = 0,
                  mesh_info: dict = None):
         
@@ -171,6 +176,7 @@ class BaseGeometry(metaclass=abc.ABCMeta):
             return 0
         
         return 1
-        
-
-        
+                
+    def getMesh(self):
+        return self._mesh
+    
