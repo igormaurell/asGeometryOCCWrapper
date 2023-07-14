@@ -15,6 +15,10 @@ class Revolution(BaseSweptSurface):
         return 'Revolution'
     
     @staticmethod
+    def getColor():
+        return (0, 128, 128) #teal
+    
+    @staticmethod
     def adaptor2Geom(adaptor):
         return Geom_SurfaceOfRevolution(CurveFactory.adaptor2Geom(adaptor.BasisCurve())[0], adaptor.AxeOfRevolution())
 

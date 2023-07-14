@@ -40,17 +40,24 @@ class BaseGeometry(metaclass=abc.ABCMeta):
 
     @staticmethod
     @abc.abstractmethod
+    def getColor():
+        pass
+
+    @staticmethod
+    @abc.abstractmethod
     def adaptor2Geom(adaptor: Union[BRepAdaptor_Curve, GeomAdaptor_Curve, BRepAdaptor_Surface, GeomAdaptor_Surface]):
         pass
 
     @classmethod
     @abc.abstractmethod
-    def _fromDict(cls, features: dict):
+    def _geomFromDict(cls, features: dict):
         pass
 
     @classmethod
     def fromDict(cls, features: dict):
-        obj = cls._fromDict(features)
+        geom = cls._geomFromDict(features)
+        orientation = int(not features['foward']) if 'foward' in features else 0
+        obj = cls(geom, orientation)
         obj.setMeshInfo(features)
         return obj
         

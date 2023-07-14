@@ -10,15 +10,17 @@ class Ellipse(BaseConicCurve):
         return 'Ellipse'
     
     @staticmethod
+    def getColor():
+        return (0,128,0) #dark-green
+    
+    @staticmethod
     def adaptor2Geom(adaptor):
         return Geom_Ellipse(adaptor.Ellipse())
     
     @classmethod
-    def _fromDict(cls, features: dict):
-        geom = Geom_Ellipse(gp_Ax2(gp_Pnt(*features['location']), gp_Dir(*features['z_axis']),
-                                   gp_Dir(*features['x_axis'])), features['x_radius'], features['y_radius'])
-        orientation = int(not features['foward'])
-        return cls(geom, orientation)
+    def _geomFromDict(cls, features: dict):
+        geom = Geom_Ellipse(cls._features2Ax2(features), features['x_radius'], features['y_radius'])
+        return geom
     
     def getFocus1(self):
         return self._geom.Focus1().Coord()

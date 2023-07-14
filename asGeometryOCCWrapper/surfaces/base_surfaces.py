@@ -1,7 +1,7 @@
 import abc
 from typing import Union
 
-from OCC.Core.gp import gp_Pnt, gp_Dir, gp_Pnt2d
+from OCC.Core.gp import gp_Pnt, gp_Dir, gp_Pnt2d, gp_Ax3
 from OCC.Core.GeomAdaptor import GeomAdaptor_Surface
 from OCC.Core.BRepAdaptor import BRepAdaptor_Surface
 from OCC.Core.GeomAPI import GeomAPI_ProjectPointOnSurf
@@ -62,11 +62,10 @@ class BaseSurface(BaseGeometry, metaclass=abc.ABCMeta):
             proj_normals.append(nr)
             proj_params.append(pr)
                 
-        return proj_points, proj_normals, proj_params
+        return np.asarray(proj_points), np.asarray(proj_normals), np.asarray(proj_params)
     
     def computeMeshNormals(self, normalized=True):
         self._mesh.compute_vertex_normals(normalized)
-        #self._mesh.vertex_normals = o3d.utility.Vector3dVector(-np.asarray(self._mesh.vertex_normals))
     
     def setMeshByGlobal(self, global_mesh: o3d.geometry.TriangleMesh, mesh_info: dict = None):
         res = super().setMeshByGlobal(global_mesh, mesh_info)
@@ -91,6 +90,22 @@ class BaseSurface(BaseGeometry, metaclass=abc.ABCMeta):
             self.computeMeshNormals()
         
         return 4
+    
+    def computeErrors(self, points, normals=None, params=None, dtol: float = 1e-6, atol: float = 10):
+        p_points, p_normals, p_params = self.projectPointsOnGeometry(points)
+
+        results = []
+
+        distances = distanceDeviation(points, p_points)
+        dist_erros = distances[distances > dtol]
+        results.append(distances)
+
+        if normals is not None:
+            deviations = angleDeviation(normals, p_normals)
+            dev_errors = deviations[deviations > atol]
+            results.append(deviations)
+
+        return tuple(results)
 
     def validateMesh(self, dtol: float = 1e-6, atol: float = 10):
         if self._mesh_info is None or self._mesh is None:
@@ -104,10 +119,6 @@ class BaseSurface(BaseGeometry, metaclass=abc.ABCMeta):
         params = np.asarray(self._mesh_info['vert_parameters'])
 
         p_vertices, p_normals, p_params = self.projectPointsOnGeometry(self._mesh.vertices)
-
-        p_vertices = np.asarray(p_vertices)
-        p_normals = np.asarray(p_normals)
-        p_params = np.asarray(p_params)
 
         distances = distanceDeviation(vertices, p_vertices)
         dist_erros = distances[distances > dtol]
@@ -135,24 +146,15 @@ class BaseSurface(BaseGeometry, metaclass=abc.ABCMeta):
 
 class BaseElementarySurface(BaseSurface, metaclass=abc.ABCMeta):
 
-    # def _fixOrientation(self):
-    #     if self._orientation == 1:
-    #         old_loc = np.array(self.getLocation())
-    #         old_xaxis = np.array(self.getXAxis())
-    #         old_yaxis = np.array(self.getYAxis())
-    #         self._geom.Mirror(gp_Ax2(self._geom.Location(), self._geom.XAxis().Direction(), self._geom.Axis().Direction()))
-    #         self._geom.Mirror(gp_Ax2(self._geom.Location(), self._geom.YAxis().Direction(), self._geom.Axis().Direction()))
-    #         new_loc = np.array(self.getLocation())
-    #         new_xaxis = np.array(self.getXAxis())
-    #         new_yaxis = np.array(self.getYAxis())
-            
-    #         assert np.all(np.isclose(old_xaxis, -new_xaxis)) and  \
-    #                np.all(np.isclose(old_yaxis, -new_yaxis)) and  \
-    #                np.all(np.isclose(old_loc, new_loc)), \
-    #                f'Sanity Check Failed: problem in reversing a {self.getType()}. ' \
-    #                f'\n\t\t~~~~~ {old_xaxis} != {-new_xaxis} or ' \
-    #                f'{old_yaxis} != {-new_yaxis} or ' \
-    #                f'{old_loc} != {new_loc} ~~~~~'
+    @staticmethod
+    def _features2Ax3(features : dict):
+        if 'x_axis' in features:
+            return gp_Ax3(gp_Pnt(*features['location']),
+                          gp_Dir(*features['z_axis']),
+                          gp_Dir(*features['x_axis']))
+        else:
+            return gp_Ax3(gp_Pnt(*features['location']),
+                          gp_Dir(*features['z_axis']))
     
     def getLocation(self):
         return self._geom.Position().Location().Coord()

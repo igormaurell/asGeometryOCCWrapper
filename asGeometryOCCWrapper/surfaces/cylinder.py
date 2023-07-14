@@ -10,16 +10,17 @@ class Cylinder(BaseElementarySurface):
         return 'Cylinder'
     
     @staticmethod
+    def getColor():
+        return (0, 0, 255) #blue
+    
+    @staticmethod
     def adaptor2Geom(adaptor):
         return Geom_CylindricalSurface(adaptor.Cylinder())
     
     @classmethod
-    def _fromDict(cls, features: dict):
-        geom = Geom_CylindricalSurface(gp_Ax3(gp_Pnt(*features['location']), 
-                                              gp_Dir(*features['z_axis']),
-                                              gp_Dir(*features['x_axis'])), features['radius'])
-        orientation = int(not features['foward'])
-        return cls(geom, orientation)
+    def _geomFromDict(cls, features: dict):
+        geom = Geom_CylindricalSurface(cls._features2Ax3(features), features['radius'])
+        return geom
     
     def getRadius(self):
         return self._geom.Radius()

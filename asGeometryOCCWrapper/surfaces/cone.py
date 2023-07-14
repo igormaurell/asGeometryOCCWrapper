@@ -10,17 +10,17 @@ class Cone(BaseElementarySurface):
         return 'Cone'
     
     @staticmethod
+    def getColor():
+        return (0, 255, 0) #green
+    
+    @staticmethod
     def adaptor2Geom(adaptor):
         return Geom_ConicalSurface(adaptor.Cone())
 
     @classmethod
-    def _fromDict(cls, features: dict):
-        geom = Geom_ConicalSurface(gp_Ax3(gp_Pnt(*features['location']), 
-                                          gp_Dir(*features['z_axis']),
-                                          gp_Dir(*features['x_axis'])), 
-                                          features['angle'], features['radius'])
-        orientation = int(not features['foward'])
-        return cls(geom, orientation)
+    def _geomFromDict(cls, features: dict):
+        geom = Geom_ConicalSurface(cls._features2Ax3(features), features['angle'], features['radius'])
+        return geom
 
     def getRadius(self):
         return self._geom.RefRadius()

@@ -13,15 +13,15 @@ class Torus(BaseElementarySurface):
     @staticmethod
     def adaptor2Geom(adaptor):
         return Geom_ToroidalSurface(adaptor.Torus())
+    
+    @staticmethod
+    def getColor():
+        return (255, 0, 255) #magenta
 
     @classmethod
-    def _fromDict(cls, features: dict):
-        geom = Geom_ToroidalSurface(gp_Ax3(gp_Pnt(*features['location']), 
-                                           gp_Dir(*features['z_axis']),
-                                           gp_Dir(*features['x_axis'])),
-                                           features['max_radius'], features['min_radius'])
-        orientation = int(not features['foward'])
-        return cls(geom, orientation)
+    def _geomFromDict(cls, features: dict):
+        geom = Geom_ToroidalSurface(cls._features2Ax3(features), features['max_radius'], features['min_radius'])
+        return geom
     
     def getCoefficients(self):
         data = TColStd_Array1OfReal(1, 31)

@@ -10,14 +10,17 @@ class Line(BaseCurve):
         return 'Line'
     
     @staticmethod
+    def getColor():
+        return (255, 128, 0) #orange
+    
+    @staticmethod
     def adaptor2Geom(adaptor):
         return Geom_Line(adaptor.Line())
     
     @classmethod
-    def _fromDict(cls, features: dict):
+    def _geomFromDict(cls, features: dict):
         geom = Geom_Line(gp_Pnt(*features['location']), gp_Dir(*features['direction']))
-        orientation = int(not features['foward'])
-        return cls(geom, orientation)
+        return geom
     
     def getLocation(self):
         return self._geom.Position().Location().Coord()

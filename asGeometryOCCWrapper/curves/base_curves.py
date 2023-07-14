@@ -4,6 +4,7 @@ import abc
 from OCC.Core.Geom import Geom_Curve
 from OCC.Core.GeomAdaptor import GeomAdaptor_Curve
 from OCC.Core.BRepAdaptor import BRepAdaptor_Curve
+from OCC.Core.gp import gp_Pnt, gp_Dir, gp_Ax2
 
 import numpy as np
 import open3d as o3d
@@ -48,6 +49,16 @@ class BaseCurve(BaseGeometry, metaclass=abc.ABCMeta):
 
 
 class BaseConicCurve(BaseCurve, metaclass=abc.ABCMeta):
+
+    @staticmethod
+    def _features2Ax2(features : dict):
+        if 'x_axis' in features:
+            return gp_Ax2(gp_Pnt(*features['location']),
+                          gp_Dir(*features['z_axis']),
+                          gp_Dir(*features['x_axis']))
+        else:
+            return gp_Ax2(gp_Pnt(*features['location']),
+                          gp_Dir(*features['z_axis']))
     
     def getLocation(self):
         return self._geom.Location().Coord()

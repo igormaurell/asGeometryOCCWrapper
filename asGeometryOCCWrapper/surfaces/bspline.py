@@ -14,11 +14,15 @@ class BSpline(BaseBoundedSurface):
         return 'BSpline'
     
     @staticmethod
+    def getColor():
+        return (0, 255, 255) #cyan
+    
+    @staticmethod
     def adaptor2Geom(adaptor):
         return adaptor.BSpline()
     
     @classmethod
-    def _fromDict(cls, features: dict):
+    def _geomFromDict(cls, features: dict):
         poles = list2tcol2d(features['poles'], TColgp_Array2OfPnt, gp_Pnt)
         u_knots = list2tcol1d(features['u_knots'], TColStd_Array1OfReal, float)
         v_knots = list2tcol1d(features['v_knots'], TColStd_Array1OfReal, float)
@@ -27,8 +31,7 @@ class BSpline(BaseBoundedSurface):
         v_multiplicities = list2tcol1d(features['v_multiplicities'], TColStd_Array1OfInteger, int)
         geom = Geom_BSplineSurface(poles, weights, u_knots, v_knots, u_multiplicities, v_multiplicities,
                                    features['u_degree'], features['v_degree'], features['u_periodic'], features['v_periodic'])
-        orientation = int(not features['foward'])
-        return cls(geom, orientation)
+        return geom
     
     def getIsURational(self):
         return self._geom.IsURational()

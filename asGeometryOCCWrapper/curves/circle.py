@@ -8,17 +8,19 @@ class Circle(BaseConicCurve):
     @staticmethod
     def getType():
         return 'Circle'
+    
+    @staticmethod
+    def getColor():
+        return (255, 0, 128) #pink
 
     @staticmethod
     def adaptor2Geom(adaptor):
         return Geom_Circle(adaptor.Circle())
     
     @classmethod
-    def _fromDict(cls, features: dict):
-        geom = Geom_Circle(gp_Ax2(gp_Pnt(*features['location']), gp_Dir(*features['z_axis']),
-                                  gp_Dir(*features['x_axis'])), features['radius'])
-        orientation = int(not features['foward'])
-        return cls(geom, orientation)
+    def _geomFromDict(cls, features: dict):
+        geom = Geom_Circle(cls._features2Ax2(features), features['radius'])
+        return geom
     
     def getRadius(self):
         return self._geom.Radius()

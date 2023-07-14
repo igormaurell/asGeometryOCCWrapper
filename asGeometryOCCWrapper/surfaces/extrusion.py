@@ -15,6 +15,10 @@ class Extrusion(BaseSweptSurface):
         return 'Extrusion'
     
     @staticmethod
+    def getColor():
+        return (128,0,128) #purple
+    
+    @staticmethod
     def adaptor2Geom(adaptor):
         return Geom_SurfaceOfLinearExtrusion(CurveFactory.adaptor2Geom(adaptor.BasisCurve()), adaptor.Direction())
 

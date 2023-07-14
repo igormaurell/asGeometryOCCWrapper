@@ -14,19 +14,22 @@ class BSpline(BaseBoundedCurve):
         return 'BSpline'
     
     @staticmethod
+    def getColor():
+        return (128,128,128) #gray
+    
+    @staticmethod
     def adaptor2Geom(adaptor):
         return adaptor.BSpline()
     
     @classmethod
-    def _fromDict(cls, features: dict):
+    def _geomFromDict(cls, features: dict):
         poles = list2tcol1d(features['poles'], TColgp_Array1OfPnt, gp_Pnt)
         knots = list2tcol1d(features['knots'], TColStd_Array1OfReal, float)
         weights = list2tcol1d(features['weights'], TColStd_Array1OfReal, float)
         multiplicities = list2tcol1d(features['multiplicities'], TColStd_Array1OfInteger, int)
         geom = Geom_BSplineCurve(poles, weights, knots, multiplicities, 
                                  features['degree'], features['periodic'])
-        orientation = int(not features['foward'])
-        return cls(geom, orientation)
+        return geom
     
     def getIsRational(self):
         return self._geom.IsRational()
