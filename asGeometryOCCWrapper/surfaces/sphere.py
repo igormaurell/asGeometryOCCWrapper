@@ -19,6 +19,15 @@ class Sphere(BaseElementarySurface):
     def adaptor2Geom(adaptor):
         return Geom_SphericalSurface(adaptor.Sphere())
     
+    @staticmethod
+    def _features2Ax3(features : dict):
+        # not even z_axis is really needed for sphere
+        if 'z_axis' in features:
+            return BaseElementarySurface._features2Ax3(features)
+        else:
+            return gp_Ax3(gp_Pnt(*features['location']),
+                          gp_Dir(0., 0., 1.))
+    
     @classmethod
     def _geomFromDict(cls, features: dict):
         geom = Geom_SphericalSurface(cls._features2Ax3(features), features['radius'])
