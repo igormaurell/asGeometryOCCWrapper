@@ -40,12 +40,15 @@ class BaseSurface(BaseGeometry, metaclass=abc.ABCMeta):
         proj_normals = []
         proj_params = []
 
+        if isinstance(points, np.ndarray):
+            points = points.tolist()
+
         if len(points) == 0:
             return [], [], []
 
         projector = GeomAPI_ProjectPointOnSurf()
 
-        projector.Init(gp_Pnt(*(points[0])), self._geom)
+        projector.Init(gp_Pnt(*points[0]), self._geom) 
 
         pt, nr, pr = self._getPointNormalParamFromProjector(projector)
         
