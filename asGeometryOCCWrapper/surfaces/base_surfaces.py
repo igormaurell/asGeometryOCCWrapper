@@ -23,7 +23,7 @@ class BaseSurface(BaseGeometry, metaclass=abc.ABCMeta):
     def adaptor2Geom(adaptor: Union[BRepAdaptor_Surface, GeomAdaptor_Surface]):
         pass
 
-    def __init__(self, geom: Geom_Surface, topods_orientation: int = 0):
+    def __init__(self, geom: Geom_Surface, topods_orientation: int = 2):
         super().__init__(geom, topods_orientation=topods_orientation)
 
     def _getPointNormalParamFromProjector(self, projector, normal_tol=1e-3):
@@ -104,7 +104,7 @@ class BaseSurface(BaseGeometry, metaclass=abc.ABCMeta):
         results.append(distances)
 
         if normals is not None:
-            deviations = angleDeviation(normals, p_normals)
+            deviations = angleDeviation(normals, p_normals, symmetric=self._orientation==2)
             dev_errors = deviations[deviations > atol]
             results.append(deviations)
 

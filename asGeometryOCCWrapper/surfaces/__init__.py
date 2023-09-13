@@ -53,13 +53,13 @@ class SurfaceFactory:
         return cls.fromAdaptor(brep_adaptor, topods_orientation=topods.Orientation())
         
     @classmethod
-    def fromAdaptor(cls, adaptor: Union[BRepAdaptor_Surface, GeomAdaptor_Surface], topods_orientation: int = 0):
+    def fromAdaptor(cls, adaptor: Union[BRepAdaptor_Surface, GeomAdaptor_Surface], topods_orientation: int = 2):
         r = cls.adaptor2Geom(adaptor)
         if r is not None:
             return cls.fromGeom(r[0], topods_orientation=topods_orientation, cls_type=r[1])
     
     @classmethod
-    def fromGeom(cls, geom: Geom_Surface, topods_orientation: int = 0, cls_type: GeomAbs_SurfaceType = None):
+    def fromGeom(cls, geom: Geom_Surface, topods_orientation: int = 2, cls_type: GeomAbs_SurfaceType = None):
         if cls_type is None:
             cls_type = GeomAbs_SurfaceType(GeomAdaptor_Surface(geom).GetType())
 

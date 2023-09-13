@@ -18,7 +18,7 @@ class BaseCurve(BaseGeometry, metaclass=abc.ABCMeta):
     def adaptor2Geom(adaptor: Union[BRepAdaptor_Curve, GeomAdaptor_Curve]):
         pass
 
-    def __init__(self, geom: Geom_Curve , topods_orientation: int = 0):
+    def __init__(self, geom: Geom_Curve , topods_orientation: int = 2):
         super().__init__(geom, topods_orientation=topods_orientation)
 
     def _fixOrientation(self):

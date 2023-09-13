@@ -19,6 +19,9 @@ class Cone(BaseElementarySurface):
 
     @classmethod
     def _geomFromDict(cls, features: dict):
+        if 'radius' not in features or 'location' not in features:
+            features['location'] = features['apex']
+            features['radius'] = 0.
         geom = Geom_ConicalSurface(cls._features2Ax3(features), features['angle'], features['radius'])
         return geom
 

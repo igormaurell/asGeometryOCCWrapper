@@ -12,16 +12,19 @@ import open3d as o3d
 EPS = np.finfo(np.float32).eps
 
 #TODO: change the place of these functions
-def angleDeviation(arrs1, arrs2):
+def angleDeviation(arrs1, arrs2, symmetric=False):
     angles = []
     for i in range(len(arrs1)):
-        angles.append(angleVectors(arrs1[i], arrs2[i]))
+        angles.append(angleVectors(arrs1[i], arrs2[i], symmetric=symmetric))
     return np.degrees(np.array(angles))
 
-def angleVectors(n1, n2):
+def angleVectors(n1, n2, symmetric=False):
     n1_unit = n1/(np.linalg.norm(n1) + EPS)
     n2_unit = n2/(np.linalg.norm(n2) + EPS)
-    return np.arccos(np.clip(np.dot(n1_unit, n2_unit), -1.0, 1.0))
+    angle = np.arccos(np.clip(np.dot(n1_unit, n2_unit), -1.0, 1.0))
+    if symmetric:
+        return angle if angle <= np.pi/2 else np.pi - angle
+    return angle
 
 def distanceDeviation(arrs1, arrs2):
     return np.linalg.norm(arrs1 - arrs2, axis=1)
@@ -56,12 +59,12 @@ class BaseGeometry(metaclass=abc.ABCMeta):
     @classmethod
     def fromDict(cls, features: dict):
         geom = cls._geomFromDict(features)
-        orientation = int(not features['foward']) if 'foward' in features else 0
+        orientation = int(not features['foward']) if 'foward' in features else 2
         obj = cls(geom, orientation)
         obj.setMeshInfo(features)
         return obj
         
-    def __init__(self, geom: Union[Geom_Curve, Geom_Surface], topods_orientation: int = 0,
+    def __init__(self, geom: Union[Geom_Curve, Geom_Surface], topods_orientation: int = 2,
                  mesh_info: dict = None):
         
         self.setGeom(geom, topods_orientation=topods_orientation)
@@ -123,7 +126,7 @@ class BaseGeometry(metaclass=abc.ABCMeta):
 
         return features
     
-    def setGeom(self, geom: Union[Geom_Curve, Geom_Surface], topods_orientation: int = 0):
+    def setGeom(self, geom: Union[Geom_Curve, Geom_Surface], topods_orientation: int = 2):
         self._geom = geom
         self._orientation = topods_orientation
         self._fixOrientation()
