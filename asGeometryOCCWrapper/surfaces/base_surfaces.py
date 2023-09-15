@@ -94,18 +94,16 @@ class BaseSurface(BaseGeometry, metaclass=abc.ABCMeta):
         
         return 4
     
-    def computeErrors(self, points, normals=None, params=None, dtol: float = 1e-6, atol: float = 10):
+    def computeErrors(self, points, normals=None, params=None, symmetric_normals=False):
         p_points, p_normals, p_params = self.projectPointsOnGeometry(points)
 
         results = []
 
         distances = distanceDeviation(points, p_points)
-        dist_erros = distances[distances > dtol]
         results.append(distances)
 
         if normals is not None:
-            deviations = angleDeviation(normals, p_normals, symmetric=self._orientation==2)
-            dev_errors = deviations[deviations > atol]
+            deviations = angleDeviation(normals, p_normals, symmetric=(symmetric_normals or self._orientation==2))
             results.append(deviations)
 
         return tuple(results)
