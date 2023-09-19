@@ -50,7 +50,12 @@ class BaseSurface(BaseGeometry, metaclass=abc.ABCMeta):
 
         projector.Init(gp_Pnt(*points[0]), self._geom) 
 
-        pt, nr, pr = self._getPointNormalParamFromProjector(projector)
+        try:
+            pt, nr, pr = self._getPointNormalParamFromProjector(projector)
+        except:
+            pt = (np.nan, np.nan, np.nan)
+            nr = (np.nan, np.nan, np.nan)
+            pr = (np.nan, np.nan)
         
         proj_points.append(pt)
         proj_normals.append(nr)
@@ -59,7 +64,12 @@ class BaseSurface(BaseGeometry, metaclass=abc.ABCMeta):
         for i in range(1, len(points)):
             projector.Perform(gp_Pnt(*(points[i])))
 
-            pt, nr, pr = self._getPointNormalParamFromProjector(projector)
+            try:
+                pt, nr, pr = self._getPointNormalParamFromProjector(projector)
+            except:
+                pt = (np.nan, np.nan, np.nan)
+                nr = (np.nan, np.nan, np.nan)
+                pr = (np.nan, np.nan)
         
             proj_points.append(pt)
             proj_normals.append(nr)
