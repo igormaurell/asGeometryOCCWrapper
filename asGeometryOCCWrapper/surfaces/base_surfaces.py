@@ -27,13 +27,27 @@ class BaseSurface(BaseGeometry, metaclass=abc.ABCMeta):
         super().__init__(geom, topods_orientation=topods_orientation)
 
     def _getPointNormalParamFromProjector(self, projector, normal_tol=1e-3):
-        proj_point = projector.NearestPoint()
-        u, v = projector.LowerDistanceParameters()
-        normal = gp_Dir()
-        r = geomlib_NormEstim(self._geom, gp_Pnt2d(u, v),  normal_tol, normal)
-        if self._orientation == 1:
-            normal.Reverse()
-        return proj_point.Coord(), normal.Coord(), (u, v)
+        try:
+            proj_point = projector.NearestPoint().Coord()
+        except:
+            proj_point = (np.nan, np.nan, np.nan)
+
+        try:
+            u, v = projector.LowerDistanceParameters()
+        except:
+            u, v = np.nan, np.nan
+
+        normal_gp = gp_Dir()
+        r = geomlib_NormEstim(self._geom, gp_Pnt2d(u, v),  normal_tol, normal_gp)
+
+        if r >= 2:
+            normal = (np.nan, np.nan, np.nan)
+        else:
+            if self._orientation == 1:
+                normal_gp.Reverse()
+            normal = normal_gp.Coord()
+
+        return proj_point, normal, (u, v)
 
     def projectPointsOnGeometry(self, points: list):
         proj_points = []
@@ -50,12 +64,7 @@ class BaseSurface(BaseGeometry, metaclass=abc.ABCMeta):
 
         projector.Init(gp_Pnt(*points[0]), self._geom) 
 
-        try:
-            pt, nr, pr = self._getPointNormalParamFromProjector(projector)
-        except:
-            pt = (np.nan, np.nan, np.nan)
-            nr = (np.nan, np.nan, np.nan)
-            pr = (np.nan, np.nan)
+        pt, nr, pr = self._getPointNormalParamFromProjector(projector)
         
         proj_points.append(pt)
         proj_normals.append(nr)
@@ -64,12 +73,7 @@ class BaseSurface(BaseGeometry, metaclass=abc.ABCMeta):
         for i in range(1, len(points)):
             projector.Perform(gp_Pnt(*(points[i])))
 
-            try:
-                pt, nr, pr = self._getPointNormalParamFromProjector(projector)
-            except:
-                pt = (np.nan, np.nan, np.nan)
-                nr = (np.nan, np.nan, np.nan)
-                pr = (np.nan, np.nan)
+            pt, nr, pr = self._getPointNormalParamFromProjector(projector)
         
             proj_points.append(pt)
             proj_normals.append(nr)
